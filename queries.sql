@@ -57,3 +57,21 @@ SELECT
     income
 FROM x
 ORDER BY dow, seller;
+
+--СTE создаёт возрастные категории, а тело основного запроса подсчитывает кол-во людей в каждой категории--
+WITH age_cat AS (
+    SELECT
+        CASE
+            WHEN age BETWEEN 16 AND 25 THEN '16-25'
+            WHEN age BETWEEN 26 AND 40 THEN '26-40'
+            WHEN age > 40 THEN '40+'
+        END AS age_category
+    FROM customers
+)
+SELECT
+    age_category,
+    COUNT(age_category)
+FROM age_cat
+GROUP BY age_category
+ORDER BY age_category;
+
