@@ -75,3 +75,22 @@ FROM age_cat
 GROUP BY age_category
 ORDER BY age_category;
 
+--Вычисляет количество клиентов и сумму дохода по месяцам-- 
+WITH tab AS (
+    SELECT
+        s.customer_id AS total_customers,
+        TO_CHAR(sale_date, 'YYYY-MM') AS selling_month,
+        SUM(s.quantity * p.price) AS income
+    FROM sales AS s
+    INNER JOIN products AS p
+        ON s.product_id = p.product_id
+    GROUP BY TO_CHAR(sale_date, 'YYYY-MM'), s.customer_id
+    ORDER BY TO_CHAR(sale_date, 'YYYY-MM')
+)
+SELECT DISTINCT
+    selling_month,
+    COUNT(total_customers),
+    FLOOR(SUM(income))
+FROM tab
+GROUP BY selling_month;
+
