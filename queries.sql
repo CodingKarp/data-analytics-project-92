@@ -105,8 +105,8 @@ WITH tab AS (
     FROM sales
 )
 SELECT
-    t.sale_date,
     CONCAT(c.first_name, ' ', c.last_name) AS customer,
+    t.sale_date,
     CONCAT(e.first_name, ' ', e.last_name) AS seller
 FROM tab AS t
 INNER JOIN customers AS c
