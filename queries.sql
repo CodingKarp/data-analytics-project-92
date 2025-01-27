@@ -40,19 +40,20 @@ ORDER BY average_income;
 -- CTE для нахождения суммы продаж по дате--
 WITH x AS (
     SELECT
-        sa.sale_date AS day_of_week,
+        TO_CHAR(sa.sale_date, 'day') AS day_of_week,
         emp.first_name || ' ' || emp.last_name AS seller,
-        SUM(FLOOR(p.price * sa.quantity)) AS income
+        SUM(FLOOR(p.price * sa.quantity)) AS income,
+        EXTRACT(ISODOW FROM sa.sale_date) AS dow
     FROM sales AS sa
     INNER JOIN employees AS emp
         ON sa.sales_person_id = emp.employee_id
     INNER JOIN products AS p
         ON sa.product_id = p.product_id
-    GROUP BY seller, sa.sale_date
-    ORDER BY sa.sale_date, seller
+    GROUP BY seller, day_of_week, dow
 )
-SELECT 
+SELECT
     seller,
-    TRIM(TO_CHAR(day_of_week, 'day')) AS day_of_week, -- перевод timestamp в день недели--
+    day_of_week,
     income
-FROM x;
+FROM x
+ORDER BY dow, seller;
