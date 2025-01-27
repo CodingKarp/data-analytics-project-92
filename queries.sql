@@ -94,3 +94,27 @@ SELECT DISTINCT
 FROM tab
 GROUP BY selling_month;
 
+--Находит клиентов чья первая покупка включала акционный товар--
+WITH tab AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY customer_id
+            ORDER BY sale_date
+        ) AS rw
+    FROM sales
+)
+SELECT
+    t.sale_date,
+    CONCAT(c.first_name, ' ', c.last_name) AS customer,
+    CONCAT(e.first_name, ' ', e.last_name) AS seller
+FROM tab AS t
+INNER JOIN customers AS c
+    ON t.customer_id = c.customer_id
+INNER JOIN employees AS e
+    ON t.sales_person_id = e.employee_id
+INNER JOIN products AS p
+    ON t.product_id = p.product_id
+WHERE t.rw = 1 AND p.price = 0
+GROUP BY t.sale_date, customer, seller, t.customer_id
+ORDER BY t.customer_id;
