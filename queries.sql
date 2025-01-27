@@ -89,8 +89,8 @@ WITH tab AS (
 )
 SELECT DISTINCT
     selling_month,
-    COUNT(total_customers),
-    FLOOR(SUM(income))
+    COUNT(total_customers) AS total_customers,
+    FLOOR(SUM(income)) AS income
 FROM tab
 GROUP BY selling_month;
 
