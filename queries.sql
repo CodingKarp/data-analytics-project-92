@@ -23,6 +23,7 @@ WITH income AS (
     INNER JOIN products AS p
         ON sa.product_id = p.product_id
 )
+
 --выводит всех продавцов, чья средняя стоимость сделки меньше средней общей--
 SELECT
     emp.first_name || ' ' || emp.last_name AS seller,
@@ -33,8 +34,8 @@ INNER JOIN employees AS emp
 INNER JOIN products AS p
     ON sa.product_id = p.product_id
 CROSS JOIN income
-GROUP BY seller, avg_income
-HAVING FLOOR(AVG(p.price * sa.quantity)) < avg_income
+GROUP BY seller, income.avg_income
+HAVING FLOOR(AVG(p.price * sa.quantity)) < income.avg_income
 ORDER BY average_income;
 
 -- CTE для нахождения суммы продаж по дате--
@@ -51,6 +52,7 @@ WITH x AS (
         ON sa.product_id = p.product_id
     GROUP BY seller, day_of_week, dow
 )
+
 SELECT
     seller,
     day_of_week,
@@ -58,7 +60,7 @@ SELECT
 FROM x
 ORDER BY dow, seller;
 
---СTE создаёт возрастные категории, а тело основного запроса подсчитывает кол-во людей в каждой категории--
+--СTE создаёт возрастные категории--
 WITH age_cat AS (
     SELECT
         CASE
@@ -68,9 +70,11 @@ WITH age_cat AS (
         END AS age_category
     FROM customers
 )
+
+--Подсчёт по возрастным категориям--
 SELECT
     age_category,
-    COUNT(age_category)
+    COUNT(age_category) AS age_count
 FROM age_cat
 GROUP BY age_category
 ORDER BY age_category;
@@ -79,15 +83,16 @@ ORDER BY age_category;
 WITH tab AS (
     SELECT
         s.customer_id AS total_customers,
-        TO_CHAR(sale_date, 'YYYY-MM') AS selling_month,
+        TO_CHAR(s.sale_date, 'YYYY-MM') AS selling_month,
         SUM(s.quantity * p.price) AS income
     FROM sales AS s
     INNER JOIN products AS p
         ON s.product_id = p.product_id
-    GROUP BY TO_CHAR(sale_date, 'YYYY-MM'), s.customer_id
-    ORDER BY TO_CHAR(sale_date, 'YYYY-MM')
+    GROUP BY TO_CHAR(s.sale_date, 'YYYY-MM'), s.customer_id
+    ORDER BY TO_CHAR(s.sale_date, 'YYYY-MM')
 )
-SELECT DISTINCT
+
+SELECT
     selling_month,
     COUNT(total_customers) AS total_customers,
     FLOOR(SUM(income)) AS income
@@ -104,6 +109,7 @@ WITH tab AS (
         ) AS rw
     FROM sales
 )
+
 SELECT
     CONCAT(c.first_name, ' ', c.last_name) AS customer,
     t.sale_date,
