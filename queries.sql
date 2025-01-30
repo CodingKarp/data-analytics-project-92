@@ -1,8 +1,8 @@
--- считает количество клиентов 
+/*считает количество клиентов*/
 SELECT COUNT(*) AS customers_count
 FROM customers;
 
---находит 10 лучших продавцов за весь период
+/*находит 10 лучших продавцов за весь период*/
 SELECT
     emp.first_name || ' ' || emp.last_name AS seller,
     COUNT(sa.sales_person_id) AS operations,
@@ -16,7 +16,7 @@ GROUP BY seller
 ORDER BY FLOOR(SUM(p.price * sa.quantity)) DESC LIMIT 10;
 
 
---находит среднюю стоимость сделки
+/*находит среднюю стоимость сделки*/
 WITH income AS (
     SELECT FLOOR(AVG(p.price * sa.quantity)) AS avg_income
     FROM sales AS sa
@@ -24,7 +24,7 @@ WITH income AS (
         ON sa.product_id = p.product_id
 )
 
---выводит всех продавцов, чья средняя стоимость сделки меньше средней общей
+/*выводит всех продавцов, чья средняя стоимость сделки меньше средней общей*/
 SELECT
     emp.first_name || ' ' || emp.last_name AS seller,
     FLOOR(AVG(p.price * sa.quantity)) AS average_income
@@ -38,7 +38,7 @@ GROUP BY seller, income.avg_income
 HAVING FLOOR(AVG(p.price * sa.quantity)) < income.avg_income
 ORDER BY average_income;
 
--- CTE для нахождения суммы продаж по дате
+/*CTE для нахождения суммы продаж по дате*/
 WITH x AS (
     SELECT
         TO_CHAR(sa.sale_date, 'day') AS day_of_week,
@@ -60,7 +60,7 @@ SELECT
 FROM x
 ORDER BY dow, seller;
 
---СTE создаёт возрастные категории
+/*СTE создаёт возрастные категории*/
 WITH age_cat AS (
     SELECT
         CASE
@@ -70,8 +70,7 @@ WITH age_cat AS (
         END AS age_category
     FROM customers
 )
-
---Подсчёт по возрастным категориям
+/*подсчет по возрастным категориям*/
 SELECT
     age_category,
     COUNT(age_category) AS age_count
@@ -79,7 +78,7 @@ FROM age_cat
 GROUP BY age_category
 ORDER BY age_category;
 
---Вычисляет количество клиентов и сумму дохода по месяцам
+/*вычисляет количество клиентов и сумму дохода по месяцам*/
 WITH tab AS (
     SELECT
         s.customer_id AS total_customers,
@@ -99,7 +98,7 @@ SELECT
 FROM tab
 GROUP BY selling_month;
 
---Находит клиентов, чья первая покупка включала акционный товар
+/*Находит клиентов, чья первая покупка включала акционный товар*/
 WITH tab AS (
     SELECT
         *,
